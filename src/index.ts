@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import cors from "cors";
 import mongoose from "mongoose";
+import router from "./router";
 
 const app = express();
 
@@ -18,4 +19,12 @@ const server = http.createServer(app);
 
 server.listen(8080, () => {
   console.log("Server is running on http://localhost:8080");
-})
+});
+
+const mongoUrl = "";
+
+mongoose.Promise = Promise;
+mongoose.connect(mongoUrl);
+mongoose.connection.on("error", (error: Error) => console.log(error));
+
+app.use("/", router());
