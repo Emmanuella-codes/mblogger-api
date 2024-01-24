@@ -24,10 +24,11 @@ export const register = async (req: express.Request, res: express.Response) => {
         verificationCode,
         salt,
         password: authentication(salt, password),
+        isVerified: false,
       },
     });
 
-    return res.status(201).json(user).end();
+    return res.status(200).json(user).end();
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
@@ -40,18 +41,22 @@ export const verifyUser = async (
 ) => {
   try {
     const { email, verificationCode } = req.body;
-    const user = await getUserByEmail(email);
+    const user = await getUserByEmail(email).select(
+      "+authentication.verificationCode"
+    );
 
     if (!user) {
       return res.sendStatus(400);
     }
 
-    if (user.authentication.verificationCode === verificationCode) {
-      return res.status(200).json({
-        email: user.email,
-        verificationCode: user.authentication.verificationCode,
-      });
+    if (user.authentication.verificationCode != verificationCode) {
+      return res.sendStatus(403);
     }
+
+    user.authentication.isVerified = true;
+    await user.save();
+
+    return res.status(200).json(user).end();
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
@@ -89,12 +94,11 @@ export const login = async (req: express.Request, res: express.Response) => {
 
     await user.save();
 
-    res.cookie("REST-API-AUTH", user.authentication.sessionToken, {
+    res.cookie("MBLOGGER-AUTH", user.authentication.sessionToken, {
       domain: "localhost",
       path: "/",
     });
 
-    user.authentication.isVerified == true;
     return res.status(200).json(user).end();
   } catch (error) {
     return res.sendStatus(400);

@@ -11,4 +11,6 @@ export const authentication = (salt: string, password: string) => {
 };
 
 export const generateVerificationCode = () =>
-  crypto.randomBytes(6).toString("hex");
+  `${Math.floor(Math.random() * 1000000)
+    .toString()
+    .padStart(6, "0")}`;

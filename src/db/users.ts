@@ -5,13 +5,13 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true },
   authentication: {
     verificationCode: { type: String, select: false },
-    isVerified: { type: Boolean, required: true },
+    isVerified: { type: Boolean, default: false },
     password: { type: String, required: true, select: false },
     salt: { type: String, select: false },
     sessionToken: { type: String, select: false },
   },
   response: {
-    message: { type: String, required: true },
+    message: { type: String },
     token: { type: String },
   },
 });

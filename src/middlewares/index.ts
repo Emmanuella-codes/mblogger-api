@@ -32,7 +32,7 @@ export const isAuthenticated = async (
   next: express.NextFunction
 ) => {
   try {
-    const sessionToken = req.cookies["REST-API-AUTH"];
+    const sessionToken = req.cookies["MBLOGGER-AUTH"];
 
     if (!sessionToken) {
       return res.sendStatus(403);
