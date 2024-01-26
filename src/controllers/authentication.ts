@@ -1,6 +1,16 @@
-import { createUser, getUserByEmail } from "../db/users";
+import {
+  ResetPasswordModel,
+  createUser,
+  getUserByEmail,
+  getUserById,
+} from "../db/users";
 import express from "express";
-import { authentication, generateVerificationCode, random } from "../helpers";
+import {
+  authentication,
+  generateVerificationCode,
+  random,
+  token,
+} from "../helpers";
 
 export const register = async (req: express.Request, res: express.Response) => {
   try {
@@ -35,7 +45,7 @@ export const register = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export const verifyUser = async (
+export const verifyEmail = async (
   req: express.Request,
   res: express.Response
 ) => {
@@ -104,6 +114,92 @@ export const login = async (req: express.Request, res: express.Response) => {
       .json({ token: user.authentication.sessionToken })
       .end();
   } catch (error) {
+    return res.sendStatus(400);
+  }
+};
+
+export const forgotPassword = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.sendStatus(400);
+    }
+
+    const existingUser = await getUserByEmail(email);
+
+    if (!existingUser) {
+      return res.sendStatus(404); //return not found
+    }
+
+    //generate token & set timer to 15 minutes
+    const resetToken = token();
+    if (!resetToken) {
+      return res.sendStatus(500);
+    }
+
+    const expiresIn = new Date();
+    expiresIn.setMinutes(expiresIn.getMinutes() + 15);
+
+    const resetPasswordRequest = new ResetPasswordModel({
+      user: existingUser._id,
+      resetToken,
+      expiresIn,
+    });
+
+    await resetPasswordRequest.save();
+
+    return res
+      .status(200)
+      .json({
+        token: resetPasswordRequest.resetToken,
+        message: "use token to reset password in /api/reset-password",
+      })
+      .end();
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(400);
+  }
+};
+
+export const resetPassword = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { resetToken, newPassword } = req.body;
+
+    if (!resetToken || !newPassword) {
+      return res.sendStatus(400);
+    }
+
+    const resetPassword = await ResetPasswordModel.findOne({
+      resetToken,
+      expiresIn: { $gt: new Date() },
+    });
+
+    if (!resetPassword) {
+      return res.sendStatus(401);
+    }
+
+    const user = await getUserById(resetPassword.user);
+    user.authentication.password = authentication(
+      user.authentication.salt,
+      newPassword
+    );
+
+    await user.save();
+    await ResetPasswordModel.deleteOne({ _id: resetPassword._id });
+
+    return res
+      .status(200)
+      .json({ message: "your password change was successfull" })
+      .end();
+  } catch (error) {
+    console.log(error);
     return res.sendStatus(400);
   }
 };
