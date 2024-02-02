@@ -22,7 +22,7 @@ server.listen(8080, () => {
 });
 
 const mongoUrl =
-  "";
+  "mongodb+srv://emmanuellachukwu77:QUdXGlTLONueyvsa@cluster0.qrbecxq.mongodb.net/?retryWrites=true&w=majority";
 
 mongoose.Promise = Promise;
 mongoose.connect(mongoUrl);

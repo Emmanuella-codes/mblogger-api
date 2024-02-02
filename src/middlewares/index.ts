@@ -1,7 +1,23 @@
 import express from "express";
 import { get, merge } from "lodash";
+import jwt from "jsonwebtoken"
 
 import { getUserBySessionToken } from "../db/users";
+
+const verifyToken = async(req: express.Request,
+  res: express.Response,
+  next: express.NextFunction) => {
+    try {
+      const token = req.header('Authorization')
+      
+      if(!token) {
+        return res.sendStatus(401)
+      }
+    } catch (error) {
+      console.log(error);
+    return res.sendStatus(400);
+    }
+  }
 
 export const isOwner = async (
   req: express.Request,
