@@ -1,11 +1,14 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import 'dotenv/config'
 
 export const random = () => crypto.randomBytes(128).toString("base64");
 
-export const authentication = (password: string) => {
-  return bcrypt.hash(password, 10);
+export const generateOtp = () => `${Math.floor(1000 + Math.random() * 9000)}`;
+
+export const authentication = async (password: string) => {
+  return await bcrypt.hash(password, 10);
 };
 
 export const generateVerificationCode = () =>

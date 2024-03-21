@@ -6,11 +6,12 @@ const UserSchema = new mongoose.Schema({
   authentication: {
     isVerified: { type: Boolean, default: false },
     verificationCode: { type: String },
+    verificationCodeExpIn: { type: Date },
     password: { type: String, required: true, select: false },
     salt: { type: String, select: false },
     resetPassword: {
-      resetToken: { type: String, required: true },
-      expiresIn: { type: Date, required: true },
+      resetToken: { type: String },
+      expiresIn: { type: Date },
     },
   },
 });
