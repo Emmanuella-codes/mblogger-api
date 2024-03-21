@@ -4,30 +4,24 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true },
   authentication: {
-    verificationCode: { type: String, select: false },
     isVerified: { type: Boolean, default: false },
+    verificationCode: { type: String },
+    verificationCodeExpIn: { type: Date },
     password: { type: String, required: true, select: false },
     salt: { type: String, select: false },
-    sessionToken: { type: String, select: false },
+    resetPassword: {
+      resetToken: { type: String },
+      expiresIn: { type: Date },
+    },
   },
 });
 
-const ResetPasswordSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  resetToken: { type: String, required: true },
-  expiresIn: { type: Date, required: true },
-});
-
 export const UserModel = mongoose.model("User", UserSchema);
-export const ResetPasswordModel = mongoose.model(
-  "ResetPassword",
-  ResetPasswordSchema
-);
 
 export const getUsers = () => UserModel.find();
 export const getUserByEmail = (email: string) => UserModel.findOne({ email });
-export const getUserBySessionToken = (sessionToken: string) =>
-  UserModel.findOne({ "authentication.sessionToken": sessionToken });
+// export const getUserBySessionToken = (sessionToken: string) =>
+//   UserModel.findOne({ "authentication.sessionToken": sessionToken });
 export const getUserById = (id: string | Types.ObjectId) =>
   UserModel.findById(id);
 export const createUser = (values: Record<string, any>) =>

@@ -1,13 +1,14 @@
+import jwt from "jsonwebtoken";
 import crypto from "crypto";
-
-const SECRET = "MBLOGGER-API";
+import bcrypt from "bcrypt";
+import 'dotenv/config'
 
 export const random = () => crypto.randomBytes(128).toString("base64");
-export const authentication = (salt: string, password: string) => {
-  return crypto
-    .createHmac("sha256", [salt, password].join("/"))
-    .update(SECRET)
-    .digest("hex");
+
+export const generateOtp = () => `${Math.floor(1000 + Math.random() * 9000)}`;
+
+export const authentication = async (password: string) => {
+  return await bcrypt.hash(password, 10);
 };
 
 export const generateVerificationCode = () =>
@@ -15,4 +16,6 @@ export const generateVerificationCode = () =>
     .toString()
     .padStart(6, "0")}`;
 
-export const token = () => crypto.randomBytes(32).toString("hex");
+export const generateToken = (userID: string) => {
+  return jwt.sign({ userID }, process.env.SECRET_KEY, { expiresIn: "1h" });
+};
