@@ -1,4 +1,4 @@
-import { createBlog, deleteBlogById, getUserBlog } from "../db/blog";
+import { createBlog, deleteBlogById, getUserBlog, getBlogs } from "../db/blog";
 import express from "express";
 import { IUserRequest } from "types";
 
@@ -126,6 +126,18 @@ export const deleteBlogPost = async (
     return res
       .status(200)
       .json({ deletedPost, message: "Blog post was deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(400);
+  }
+};
+
+export const getAllBlogs = async (req: IUserRequest, res: express.Response) => {
+  try {
+    const blogs = await getBlogs();
+    const blogPosts = blogs.map((posts) => posts.blogPost);
+
+    return res.status(200).json(blogPosts);
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);

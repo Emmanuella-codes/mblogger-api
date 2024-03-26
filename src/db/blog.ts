@@ -29,7 +29,7 @@ const BlogSchema = new mongoose.Schema({
 
 export const BlogModel = mongoose.model("Blog", BlogSchema);
 
-export const getAllBlogs = () => BlogModel.find();
+export const getBlogs = () => BlogModel.find();
 export const getUserBlog = (user: string) => BlogModel.findOne({ user });
 export const createBlog = (values: Record<string, any>) =>
   new BlogModel(values).save().then((user) => user.toObject());
