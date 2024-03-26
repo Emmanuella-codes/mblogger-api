@@ -34,9 +34,8 @@ export const createBlogPost = async (
         content,
         createdOn,
       });
+      await userBlog.save();
     }
-
-    await userBlog.save();
 
     return res
       .status(201)
@@ -107,7 +106,7 @@ export const deleteBlogPost = async (
       return res.sendStatus(400);
     }
 
-    const userBlog = await getUserBlog(userId as string);
+    const userBlog = await getUserBlog(userId);
     if (!userBlog) {
       return res.status(400).json({ message: "User's blog not found" });
     }
@@ -115,6 +114,7 @@ export const deleteBlogPost = async (
     const postToDelete = userBlog.blogPost.find(
       (post) => post._id.toString() === blogId
     );
+    console.log(postToDelete);
 
     if (!postToDelete) {
       return res.status(400).json({ message: "Blog post does not exist" });
@@ -125,7 +125,7 @@ export const deleteBlogPost = async (
     await userBlog.save();
     return res
       .status(200)
-      .json({ deletedPost, message: "Blog post deleted successfully" });
+      .json({ deletedPost, message: "Blog post was deleted successfully" });
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);

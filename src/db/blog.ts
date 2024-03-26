@@ -40,6 +40,10 @@ export const getBlogPostById = (id: string | Types.ObjectId) =>
   BlogModel.findOne({ "blogPost.id": id });
 export const updateBlogById = (id: string) => BlogModel.findByIdAndUpdate(id);
 export const deleteBlogById = (id: string) =>
-  BlogModel.findOneAndDelete({ _id: id });
+  BlogModel.findOneAndUpdate(
+    { "blogPost._id": id },
+    { $pull: { blogPost: { _id: id } } },
+    { new: true }
+  );
 export const deleteCommentById = (commentId: string) =>
   BlogModel.findOneAndDelete({ _id: commentId });
