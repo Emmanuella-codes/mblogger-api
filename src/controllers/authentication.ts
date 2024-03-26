@@ -92,7 +92,11 @@ export const verifyEmail = async (
   }
 };
 
-export const login = async (req: express.Request, res: express.Response) => {
+export const login = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
   try {
     const { email, password } = req.body;
 
@@ -128,15 +132,20 @@ export const login = async (req: express.Request, res: express.Response) => {
 
     await user.save();
 
-    res.cookie("access-token", accessToken, {
-      domain: "localhost",
-      maxAge: 60 * 60 * 1000,
-      path: "/",
-      httpOnly: true,
-    });
+    res
+      .cookie("access-token", accessToken, {
+        domain: "localhost",
+        maxAge: 120 * 120 * 1000,
+        path: "/",
+        httpOnly: true,
+      })
+      .status(200)
+      .json({ token: accessToken })
+      .end();
 
-    return res.status(200).json({ token: accessToken }).end();
+    return next();
   } catch (error) {
+    console.log(error);
     return res.sendStatus(400);
   }
 };

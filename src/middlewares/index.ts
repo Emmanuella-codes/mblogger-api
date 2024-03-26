@@ -2,6 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { getUserByEmail, getUserById } from "../db/users";
 import { generateVerificationCode } from "../helpers";
+import { IUserRequest } from "../types";
 
 export const isUserVerified = async (
   req: express.Request,
@@ -50,7 +51,7 @@ export const isUserVerified = async (
 };
 
 export const verifyJwtToken = async (
-  req: express.Request,
+  req: IUserRequest,
   res: express.Response,
   next: express.NextFunction
 ) => {
@@ -62,19 +63,21 @@ export const verifyJwtToken = async (
       return res.sendStatus(401);
     }
 
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, SECRET_KEY) as { userID: string };
+    req.user = decoded.userID;
+
     if (!decoded) {
       res.sendStatus(401);
     }
 
     next();
   } catch (error) {
+    console.log(error);
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.sendStatus(400).json({ error: "Invalid access token" });
+      return res.status(400).json({ error: "Invalid access token" });
     } else if (error instanceof jwt.TokenExpiredError) {
-      return res.sendStatus(400).json({ error: "Token expired" });
+      return res.status(400).json({ error: "Token expired" });
     }
-    return res.sendStatus(400).json({ error: error });
   }
 };
 
