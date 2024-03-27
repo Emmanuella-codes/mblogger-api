@@ -45,12 +45,38 @@ export const likePost = async (req: IUserRequest, res: express.Response) => {
 
 export const unlikePost = async (req: IUserRequest, res: express.Response) => {
   try {
-    const userId = req.userID;
+    const username = req.username;
     const { blogId } = req.params;
 
     if (!blogId) {
       return res.sendStatus(400);
     }
+
+    const blog = await getBlogPostById(blogId);
+    const selectedPost = blog.blogPost.find(
+      (post) => post._id.toString() === blogId
+    );
+
+    if (!selectedPost) {
+      return res.sendStatus(400);
+    }
+
+    const usernameIdx = selectedPost.likes.usernames.indexOf(username);
+    if (usernameIdx === -1) {
+      return res.status(400).json({ error: "You have not liked this post" });
+    }
+
+    selectedPost.likes.count--;
+    selectedPost.likes.usernames.splice(usernameIdx, 1);
+
+    await blog.save();
+
+    return res
+      .status(200)
+      .json({
+        message: "Blog post unliked successfully",
+      })
+      .end();
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
