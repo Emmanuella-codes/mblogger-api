@@ -1,4 +1,4 @@
-import { getBlogPostById } from "../db/blog";
+import { getBlogPostById, getUserBlog } from "../db/blog";
 import express from "express";
 import { IUserRequest } from "types";
 
@@ -175,11 +175,15 @@ export const getUserBlogPosts = async (
 ) => {
   try {
     const userId = req.userID;
-    const { blogId } = req.params;
 
-    if (!blogId) {
-      return res.sendStatus(400);
+    const user = await getUserBlog(userId);
+    if (!user) {
+      return res.sendStatus(404);
     }
+
+    const blog = user.blogPost;
+
+    res.status(200).json(blog);
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);
