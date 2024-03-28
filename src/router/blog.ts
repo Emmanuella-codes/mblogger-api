@@ -21,11 +21,7 @@ export default (router: express.Router) => {
   router.get("/api/blogs", verifyJwtToken, getAllBlogs);
   router.post("/api/blogs/:blogId/like", verifyJwtToken, isOwner, likePost);
   router.delete("/api/blogs/:blogId/unlike", verifyJwtToken, isOwner, unlikePost);
-  router.post("/api/blogs/:blogId/comments", verifyJwtToken, commentOnPost);
-  router.delete(
-    "/api/blogs/:blogId/comments/:commentId",
-    verifyJwtToken,
-    deleteCommentOnPost
-  );
+  router.post("/api/blogs/:blogId/comments", verifyJwtToken, isOwner, commentOnPost);
+  router.delete("/api/blogs/:blogId/comments/:commentId", verifyJwtToken, isOwner, deleteCommentOnPost);
   router.get("/api/user/blogs", verifyJwtToken, getUserBlogPosts);
 };

@@ -67,7 +67,7 @@ export const verifyJwtToken = async (
     req.userID = decoded.userID;
 
     if (!decoded) {
-      res.sendStatus(401);
+      return res.sendStatus(401);
     }
 
     next();

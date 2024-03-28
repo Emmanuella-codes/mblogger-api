@@ -2,13 +2,9 @@ import mongoose, { Types } from "mongoose";
 
 const CommentSchema = new mongoose.Schema({
   creator: { type: String },
-  comment: [
-    {
-      _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
-      text: { type: String },
-      createdOn: { type: Date },
-    },
-  ],
+  comment: { type: String, maxlength: 150 },
+  _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  createdOn: { type: Date },
 });
 
 const BlogSchema = new mongoose.Schema({
