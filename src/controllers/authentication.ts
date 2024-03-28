@@ -128,7 +128,7 @@ export const login = async (
         .json({ error: "Wrong email and password combination." });
     }
 
-    const accessToken = generateToken(user.id);
+    const accessToken = generateToken(user._id.toString());
 
     await user.save();
 

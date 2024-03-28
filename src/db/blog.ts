@@ -2,16 +2,11 @@ import mongoose, { Types } from "mongoose";
 
 const CommentSchema = new mongoose.Schema({
   creator: { type: String },
-  comment: [
-    {
-      _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
-      text: { type: String },
-      createdOn: { type: Date },
-    },
-  ],
+  comment: { type: String, maxlength: 150 },
+  _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  createdOn: { type: Date },
 });
 
-//created on, created by, last updated
 const BlogSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   blogPost: [
@@ -21,7 +16,10 @@ const BlogSchema = new mongoose.Schema({
       content: { type: String, required: true, maxlength: 250 },
       createdOn: { type: Date, required: true },
       lastModifed: { type: Date },
-      isLiked: { type: Boolean, default: false },
+      likes: {
+        count: { type: Number, default: 0 },
+        usernames: [{ type: String }],
+      },
       hasComments: [CommentSchema],
     },
   ],
@@ -37,7 +35,7 @@ export const createBlog = (values: Record<string, any>) =>
 export const getUserBlogById = (id: string | Types.ObjectId) =>
   BlogModel.findById(id);
 export const getBlogPostById = (id: string | Types.ObjectId) =>
-  BlogModel.findOne({ "blogPost.id": id });
+  BlogModel.findOne({ "blogPost._id": id });
 export const updateBlogById = (id: string) => BlogModel.findByIdAndUpdate(id);
 export const deleteBlogById = (id: string) =>
   BlogModel.findOneAndUpdate(

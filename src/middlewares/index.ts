@@ -64,10 +64,10 @@ export const verifyJwtToken = async (
     }
 
     const decoded = jwt.verify(token, SECRET_KEY) as { userID: string };
-    req.user = decoded.userID;
+    req.userID = decoded.userID;
 
     if (!decoded) {
-      res.sendStatus(401);
+      return res.sendStatus(401);
     }
 
     next();
@@ -105,6 +105,27 @@ export const isResetTokenExpired = async (
     return res.json({
       message: "Please visit /api/forgot-password to reset your password",
     });
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(400);
+  }
+};
+
+export const isOwner = async (
+  req: IUserRequest,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const userId = req.userID;
+    const existingUser = await getUserById(userId);
+
+    if (!existingUser) {
+      return res.sendStatus(400);
+    }
+
+    req.username = existingUser.username;
+    next();
   } catch (error) {
     console.log(error);
     return res.sendStatus(400);

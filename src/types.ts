@@ -1,4 +1,5 @@
 import express from "express";
 export interface IUserRequest extends express.Request {
-  user?: any;
+  userID?: any;
+  username?: any;
 }

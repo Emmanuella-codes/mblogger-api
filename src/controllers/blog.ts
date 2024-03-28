@@ -1,6 +1,6 @@
 import { createBlog, deleteBlogById, getUserBlog, getBlogs } from "../db/blog";
 import express from "express";
-import { IUserRequest } from "types";
+import { IUserRequest } from "../types";
 
 export const createBlogPost = async (
   req: IUserRequest,
@@ -8,7 +8,7 @@ export const createBlogPost = async (
 ) => {
   try {
     const { title, content } = req.body;
-    const userId = req.user;
+    const userId = req.userID;
 
     if (!title || !content) {
       return res.sendStatus(400);
@@ -56,7 +56,7 @@ export const editBlogPost = async (
 ) => {
   try {
     const { title, content } = req.body;
-    const userId = req.user;
+    const userId = req.userID;
     const { blogId } = req.params;
 
     if (!title || !content || !blogId) {
@@ -99,7 +99,7 @@ export const deleteBlogPost = async (
   res: express.Response
 ) => {
   try {
-    const userId = req.user;
+    const userId = req.userID;
     const { blogId } = req.params;
 
     if (!blogId) {
